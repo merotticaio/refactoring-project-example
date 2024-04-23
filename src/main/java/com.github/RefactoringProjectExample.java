@@ -1,5 +1,6 @@
 package com.github;
 
+import com.github.client.ClientHttpConfiguration;
 import com.github.service.PetService;
 import com.github.service.ShelterService;
 
@@ -8,8 +9,9 @@ import java.util.Scanner;
 public class RefactoringProjectExample {
 
     public static void main(String[] args) {
-        PetService petService = new PetService();
-        ShelterService shelterService = new ShelterService();
+        ClientHttpConfiguration client = new ClientHttpConfiguration();
+        PetService petService = new PetService(client);
+        ShelterService shelterService = new ShelterService(client);
 
         System.out.println("##### BOAS VINDAS AO SISTEMA ADOPET CONSOLE #####");
         try {

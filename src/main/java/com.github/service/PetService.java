@@ -1,5 +1,6 @@
 package com.github.service;
 
+import com.github.client.ClientHttpConfiguration;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -8,13 +9,16 @@ import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Scanner;
 
 public class PetService {
+
+    private final ClientHttpConfiguration client;
+
+    public PetService(ClientHttpConfiguration client) {
+        this.client = client;
+    }
 
     public void importPets() throws IOException, InterruptedException {
         System.out.println("Digite o id ou nome do abrigo:");
@@ -48,7 +52,7 @@ public class PetService {
             json.addProperty("peso", peso);
 
             String uri = "http://localhost:8080/abrigos/" + idOuNome + "/pets";
-            HttpResponse<String> response = requestPOST(uri, json);
+            HttpResponse<String> response = client.requestPOST(uri, json);
             int statusCode = response.statusCode();
             String responseBody = response.body();
             if (statusCode == 200) {
@@ -70,7 +74,7 @@ public class PetService {
         String idOuNome = new Scanner(System.in).nextLine();
 
         String uri = "http://localhost:8080/abrigos/" +idOuNome +"/pets";
-        HttpResponse<String> response = requestGET(uri);
+        HttpResponse<String> response = client.requestGET(uri);
         int statusCode = response.statusCode();
         if (statusCode == 404 || statusCode == 500) {
             System.out.println("ID ou nome não cadastrado!");
@@ -87,27 +91,6 @@ public class PetService {
             int idade = jsonObject.get("idade").getAsInt();
             System.out.println(id +" - " +tipo +" - " +nome +" - " +raca +" - " +idade +" ano(s)");
         }
-    }
-
-    private HttpResponse<String> requestGET(String uri) throws IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(uri))
-                .method("GET", HttpRequest.BodyPublishers.noBody())
-                .build();
-
-        HttpClient client = HttpClient.newHttpClient();
-        return client.send(request, HttpResponse.BodyHandlers.ofString());
-    }
-
-    private HttpResponse<String> requestPOST(String uri, JsonObject payload) throws IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(uri))
-                .header("Content-Type", "application/json")
-                .method("POST", HttpRequest.BodyPublishers.ofString(payload.toString()))
-                .build();
-
-        HttpClient client = HttpClient.newHttpClient();
-        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
 }
