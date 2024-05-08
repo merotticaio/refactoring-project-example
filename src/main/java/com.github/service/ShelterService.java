@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.client.ClientHttpConfiguration;
 import com.github.domain.Shelter;
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.Scanner;
 
+@Service
 @AllArgsConstructor
 public class ShelterService {
 
