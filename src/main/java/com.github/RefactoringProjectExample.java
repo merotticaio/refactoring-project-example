@@ -1,5 +1,6 @@
 package com.github;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.client.ClientHttpConfiguration;
 import com.github.service.PetService;
 import com.github.service.ShelterService;
@@ -9,9 +10,10 @@ import java.util.Scanner;
 public class RefactoringProjectExample {
 
     public static void main(String[] args) {
+        ObjectMapper mapper = new ObjectMapper();
         ClientHttpConfiguration client = new ClientHttpConfiguration();
-        PetService petService = new PetService(client);
-        ShelterService shelterService = new ShelterService(client);
+        PetService petService = new PetService(mapper, client);
+        ShelterService shelterService = new ShelterService(mapper, client);
 
         System.out.println("##### BOAS VINDAS AO SISTEMA ADOPET CONSOLE #####");
         try {
