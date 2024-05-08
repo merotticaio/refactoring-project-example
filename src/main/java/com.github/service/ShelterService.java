@@ -1,38 +1,33 @@
 package com.github.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.client.ClientHttpConfiguration;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.github.domain.Shelter;
+import lombok.AllArgsConstructor;
 
 import java.io.IOException;
 import java.net.http.HttpResponse;
+import java.util.Arrays;
 import java.util.Scanner;
 
+@AllArgsConstructor
 public class ShelterService {
+
+    private final ObjectMapper mapper;
 
     private final ClientHttpConfiguration client;
 
-    public ShelterService(ClientHttpConfiguration client) {
-        this.client = client;
-    }
-
     public void addShelter() throws IOException, InterruptedException {
         System.out.println("Digite o nome do abrigo:");
-        String nome = new Scanner(System.in).nextLine();
+        String name = new Scanner(System.in).nextLine();
         System.out.println("Digite o telefone do abrigo:");
-        String telefone = new Scanner(System.in).nextLine();
+        String phone = new Scanner(System.in).nextLine();
         System.out.println("Digite o email do abrigo:");
         String email = new Scanner(System.in).nextLine();
 
-        JsonObject json = new JsonObject();
-        json.addProperty("nome", nome);
-        json.addProperty("telefone", telefone);
-        json.addProperty("email", email);
-
         String uri = "http://localhost:8080/abrigos";
-        HttpResponse<String> response = client.requestPOST(uri, json);
+        Shelter shelter = Shelter.of(name, phone, email);
+        HttpResponse<String> response = client.requestPOST(uri, shelter);
         int statusCode = response.statusCode();
         String responseBody = response.body();
         if (statusCode == 200) {
@@ -48,14 +43,14 @@ public class ShelterService {
         String uri = "http://localhost:8080/abrigos";
         HttpResponse<String> response = client.requestGET(uri);
         String responseBody = response.body();
-        JsonArray jsonArray = JsonParser.parseString(responseBody).getAsJsonArray();
+
+        Shelter[] shelters = mapper.readValue(responseBody, Shelter[].class);
         System.out.println("Abrigos cadastrados:");
-        for (JsonElement element : jsonArray) {
-            JsonObject jsonObject = element.getAsJsonObject();
-            long id = jsonObject.get("id").getAsLong();
-            String nome = jsonObject.get("nome").getAsString();
-            System.out.println(id +" - " +nome);
-        }
+        Arrays.stream(shelters).forEach(shelter -> {
+            String id = shelter.getId();
+            String name = shelter.getName();
+            System.out.println(id + " - " + name);
+        });
     }
 
 }
